@@ -1,6 +1,6 @@
 environment := "esp32dev"
 
-default: build upload monitor
+default: upload monitor
 
 init:
     pio init --board {{environment}}
@@ -9,6 +9,7 @@ build:
     pio run --environment {{environment}}
 
 upload:
+    # build followed by upload
     just run upload
 
 monitor:
