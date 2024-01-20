@@ -1,4 +1,4 @@
-#include "pin.hxx"
+#include "assembly/pin.hxx"
 
 namespace pin
 {
