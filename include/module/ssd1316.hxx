@@ -11,6 +11,9 @@ namespace module::ssd1316
     };
 
     esp_err_t init(Config const *config);
+    esp_err_t draw8x8(Config const *config, uint8_t page, uint8_t column, uint8_t const *buffer);
+    esp_err_t set_cursor(Config const *config, uint8_t page, uint8_t column);
+    esp_err_t draw_text(Config const *config, char const *str);
     esp_err_t display(Config const *config, uint8_t const *buffer, size_t length);
 }
 
