@@ -180,6 +180,14 @@ namespace module::ssd1316
         assert((err = spi::init(spi_config)) == ESP_OK);
         assert((err = reset(spi_config)) == ESP_OK);
 
+        return err;
+    }
+
+    esp_err_t begin(Config const *config)
+    {
+        esp_err_t err = ESP_OK;
+        spi::SpiConfig const *spi_config = &config->spi_config;
+
         assert((err = cs_enable(spi_config)) == ESP_OK);
 
         ESP_LOGD(TAG, "SET NORMAL DISPLAY");
@@ -207,7 +215,7 @@ namespace module::ssd1316
         return err;
     }
 
-    esp_err_t set_cursor(Config const *config, uint8_t page, uint8_t column)
+    esp_err_t draw_text(Config const *config, char const *str)
     {
         esp_err_t err = ESP_OK;
         spi::SpiConfig const *spi_config = &config->spi_config;
@@ -216,24 +224,13 @@ namespace module::ssd1316
 
         // SET PAGE ADDRESS
         assert((err = spi::command(spi_config, 0x22)) == ESP_OK);
-        assert((err = spi::command(spi_config, page)) == ESP_OK);
+        assert((err = spi::command(spi_config, 0x00)) == ESP_OK);
         assert((err = spi::command(spi_config, 0x07)) == ESP_OK);
 
         // SET COLUMN ADDRESS
         assert((err = spi::command(spi_config, 0x21)) == ESP_OK);
-        assert((err = spi::command(spi_config, column * 8)) == ESP_OK);
+        assert((err = spi::command(spi_config, 0x00)) == ESP_OK);
         assert((err = spi::command(spi_config, 0xFF)) == ESP_OK);
-
-        assert((err = cs_disable(spi_config)) == ESP_OK);
-        return err;
-    }
-
-    esp_err_t draw_text(Config const *config, char const *str)
-    {
-        esp_err_t err = ESP_OK;
-        spi::SpiConfig const *spi_config = &config->spi_config;
-
-        assert((err = cs_enable(spi_config)) == ESP_OK);
 
         size_t length = strlen(str);
         for (size_t i = 0; i < length; i++)
@@ -243,31 +240,6 @@ namespace module::ssd1316
             assert((err = spi::buffer(spi_config, glyph, 8)) == ESP_OK);
         }
         // write data
-        assert((err = cs_disable(spi_config)) == ESP_OK);
-
-        return err;
-    }
-
-    esp_err_t draw8x8(Config const *config, uint8_t page, uint8_t column, uint8_t const *buffer)
-    {
-        esp_err_t err = ESP_OK;
-        spi::SpiConfig const *spi_config = &config->spi_config;
-
-        assert((err = cs_enable(spi_config)) == ESP_OK);
-
-        // SET PAGE ADDRESS
-        assert((err = spi::command(spi_config, 0x22)) == ESP_OK);
-        assert((err = spi::command(spi_config, page)) == ESP_OK);
-        assert((err = spi::command(spi_config, 0x07)) == ESP_OK);
-
-        // SET COLUMN ADDRESS
-        assert((err = spi::command(spi_config, 0x21)) == ESP_OK);
-        assert((err = spi::command(spi_config, column)) == ESP_OK);
-        assert((err = spi::command(spi_config, 0xFF)) == ESP_OK);
-
-        // write data
-        assert((err = spi::buffer(spi_config, buffer, 8)) == ESP_OK);
-
         assert((err = cs_disable(spi_config)) == ESP_OK);
 
         return err;
